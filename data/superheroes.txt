@@ -1,0 +1,6 @@
+21;batman;23
+34;shazam;45
+34;shazam;42
+21;batman;34
+13;catwoman;13
+13;catwoman;34
