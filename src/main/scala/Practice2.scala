@@ -1,4 +1,5 @@
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.explode
 
 import scala.io.StdIn
 
@@ -19,6 +20,17 @@ object Practice2 {
     tweets.printSchema()
     tweets.createOrReplaceTempView("tweets")
 
+    import sparkSession.implicits._
+
+    //Show top 10 mentioned people with mentions counts
+    val twitterEntities = sparkSession.sql("select object.twitter_entities.user_mentions from tweets")
+    val mentions = twitterEntities.select(explode($"user_mentions").as("userMentions")).toDF()
+    mentions.createOrReplaceTempView("userMentions")
+    val mentionedNamesWithCounts = sparkSession.sql("select userMentions.name as userName, count(*) as " +
+      "occurrences from userMentions where userMentions.Name is not null group by (userMentions.name) order by " +
+      "occurrences desc")
+    mentionedNamesWithCounts.show(10)
+
     //Display top 10 hashtags with occurrences. Not working properly
     val hashtags = sparkSession.sql("select twitter_entities.hashtags as twentities, count(*) as count " +
       "from tweets where (twitter_entities.hashtags is not null) group by " +
@@ -31,8 +43,8 @@ object Practice2 {
 
 
     sparkSession.sql("select body from tweets").show(10)
-    sparkSession.sql("select actor.languages, count(*) as occurences from tweets where actor.languages " +
-    "is not null group by actor.languages order by occurences desc").show(10)
+    sparkSession.sql("select actor.languages, count(*) as occurrences from tweets where actor.languages " +
+    "is not null group by actor.languages order by occurrences desc").show(10)
 
     //Display all tweets of selected user. User input required
     val userName = StdIn.readLine()
