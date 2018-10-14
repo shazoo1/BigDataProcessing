@@ -1,5 +1,5 @@
-import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 class DataSetSQL(sparkSession: SparkSession, input: String) {
   var dataSetSchema = StructType(Array(
@@ -37,4 +37,11 @@ class DataSetSQL(sparkSession: SparkSession, input: String) {
         " FROM dataSetTable" +
         " WHERE StockCode IS NOT NULL AND Description IS NOT NULL")
   }
+
+  def getStockCodeAndDescriptionAsRDD() =
+    sparkSession.sql(
+      "SELECT DISTINCT StockCode, Description" +
+        " FROM dataSetTable" +
+        " WHERE StockCode IS NOT NULL AND Description IS NOT NULL"
+    ).rdd
 }
